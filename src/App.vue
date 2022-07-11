@@ -1,21 +1,61 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import { env } from "process";
+import { nextTick, onMounted, ref } from "vue";
+
+const container = ref<HTMLElement>();
+const game = ref();
+
+onMounted(() =>
+  nextTick(async () => {
+    if (!container.value) return;
+
+    const launch = (await import("./game")).default;
+
+    game.value = await launch(container.value, {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 400,
+      physics: {
+        default: "arcade",
+        arcade: {
+          gravity: { y: 300 },
+          debug: env?.NODE_ENV === "development" ? true : false,
+        },
+      },
+    });
+  })
+);
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <Suspense>
+    <div ref="container"></div>
+
+    <template #fallback> 초기화 중입니다... </template>
+  </Suspense>
 </template>
 
 <style>
+html,
+body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: black;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  /* margin-top: 60px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 </style>

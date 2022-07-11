@@ -1,18 +1,9 @@
 import Phaser from "phaser";
+import scene from "./scenes";
 
-export default function launch(parent: HTMLElement) {
-  return new Phaser.Game({
-    type: Phaser.AUTO,
-    width: 800,
-    height: 400,
-    parent,
-    physics: {
-      default: "arcade",
-      arcade: {
-        gravity: { y: 300 },
-        debug: process.env?.development ? true : false,
-      },
-    },
-    scene: [],
-  });
+export default function launch(
+  parent: HTMLElement,
+  config: Phaser.Types.Core.GameConfig
+) {
+  return new Promise(() => new Phaser.Game({ ...config, parent, scene }));
 }

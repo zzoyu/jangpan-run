@@ -10,6 +10,7 @@ export default class SceneLoading extends Scene {
   }
 
   create() {
-    this.scene.start("SceneMain");
+    this.scene.start("SceneTitle");
+    // this.scene.stop()
   }
 }
