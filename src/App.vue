@@ -13,8 +13,10 @@ onMounted(() =>
 
     game.value = await launch(container.value, {
       type: Phaser.AUTO,
-      width: 800,
-      height: 400,
+      width: 400,
+      height: 200,
+      pixelArt: true,
+      zoom: 2,
       physics: {
         default: "arcade",
         arcade: {
