@@ -13,8 +13,8 @@ onMounted(() =>
 
     game.value = await launch(container.value, {
       type: Phaser.AUTO,
-      width: 400,
-      height: 200,
+      width: 280,
+      height: 160,
       pixelArt: true,
       zoom: 2,
       physics: {
@@ -25,6 +25,8 @@ onMounted(() =>
         },
       },
     });
+    game.value.scale.pageAlignHorizontally = true;
+    game.value.scale.pageAlignVertically = true;
   })
 );
 </script>
