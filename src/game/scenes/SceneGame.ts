@@ -48,7 +48,9 @@ export default class SceneGame extends Scene {
     // this.add.image(140, 115, "character", 18).setOrigin(0.5).setScale(2);
 
     this.physics.add.collider(this.player, grounds, () => {
-      this.controller?.setState(StateType.Standing);
+      // console.log(this.controller?.currentState);
+      if (this.controller?.currentState === StateType.Jumping)
+        this.controller?.setState(StateType.Standing);
     });
 
     this.keyJump = this.input.keyboard.addKey(
@@ -58,10 +60,6 @@ export default class SceneGame extends Scene {
     this.keySlide = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.DOWN
     );
-  }
-  setJumpable() {
-    console.log("1231312");
-    // this.isJumpable = true;
   }
   update(time: number, delta: number): void {
     if (!this.player) return;
@@ -80,8 +78,10 @@ export default class SceneGame extends Scene {
       //     break;
       case this.keySlide?.isDown:
         this.controller?.setState?.(StateType.Crawling);
-      default:
-        this.controller?.setState?.(StateType.Standing);
+        break;
+      case this.keySlide?.isUp &&
+        this.controller.currentState === StateType.Crawling:
+        this.controller?.restoreState();
     }
   }
 }

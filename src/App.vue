@@ -16,7 +16,7 @@ onMounted(() =>
       width: 280,
       height: 160,
       pixelArt: true,
-      zoom: 3,
+      zoom: 1,
       physics: {
         default: "arcade",
         arcade: {
@@ -27,6 +27,7 @@ onMounted(() =>
     });
     game.value.scale.pageAlignHorizontally = true;
     game.value.scale.pageAlignVertically = true;
+    console.log(game.value);
   })
 );
 </script>

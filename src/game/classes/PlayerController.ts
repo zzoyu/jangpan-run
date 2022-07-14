@@ -10,6 +10,7 @@ export enum StateType {
 export class PlayerController {
   states: Map<StateType, PlayerState>;
   currentState: StateType | undefined;
+  previousState: StateType | undefined;
   player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   isJumpable: boolean = true;
   scene: Scene;
@@ -34,12 +35,14 @@ export class PlayerController {
     this.states.set(
       StateType.Jumping,
       new PlayerState(
-        () => this.isJumpable,
+        () => this.isJumpable || this.previousState === StateType.Jumping,
         () => {
-          this.isJumpable = false;
+          if (this.isJumpable) {
+            this.isJumpable = false;
+            this.player.setVelocityY(-150);
+            scene.sound.play("jump");
+          }
           this.player.play(StateType.Jumping, true);
-          scene.sound.play("jump");
-          this.player.setVelocityY(-150);
         }
       )
     );
@@ -52,7 +55,6 @@ export class PlayerController {
         }
       )
     );
-    this.currentState = StateType.Standing;
     // Animation set
     this.player.anims.create({
       key: StateType.Standing,
@@ -87,13 +89,19 @@ export class PlayerController {
     });
 
     this.player.setCollideWorldBounds(true);
+    this.setState?.(StateType.Standing);
   }
 
   setState(state: StateType) {
     if (this.currentState === state) return;
     if (!this.states.get(state)?.condition?.()) return;
+    this.previousState = this.currentState;
     this.currentState = state;
     this.states.get(this.currentState)?.enter?.(this.scene);
+  }
+
+  restoreState() {
+    this.previousState && this.setState(this.previousState);
   }
 }
 
