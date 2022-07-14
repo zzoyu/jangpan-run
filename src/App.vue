@@ -16,7 +16,7 @@ onMounted(() =>
       width: 280,
       height: 160,
       pixelArt: true,
-      zoom: 1,
+      zoom: 3,
       physics: {
         default: "arcade",
         arcade: {

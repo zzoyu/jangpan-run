@@ -11,6 +11,10 @@ export default class SceneGame extends Scene {
   player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
   isJumpable: boolean = true;
   controller: PlayerController | undefined;
+  sky: Phaser.GameObjects.TileSprite | undefined;
+  stage = 1;
+  grounds: Phaser.GameObjects.Group | undefined;
+  groundsPool: Phaser.GameObjects.Group | undefined;
   constructor() {
     super({ key: SceneGame.name });
   }
@@ -18,13 +22,28 @@ export default class SceneGame extends Scene {
   preload() {}
 
   create() {
-    for (var i = 0; i < 7; i++) {
-      this.add.image(40 * i, 0, "sky", 0).setOrigin(0);
-    }
+    // for (var i = 0; i < 7; i++) {
+    //   this.add.image(40 * i, 0, "sky", 0).setOrigin(0);
+    // }
 
-    const grounds = [];
+    this.sky = this.add
+      .tileSprite(0, 0, 280, 160, "sky", this.stage - 1)
+      .setOrigin(0, 0)
+      .setScrollFactor(0, 0);
 
-    for (var i = 0; i < 7; i++) {
+    this.grounds = this.add.group({
+      removeCallback: (ground) => {
+        this.groundsPool?.add(ground);
+      },
+    });
+
+    this.groundsPool = this.add.group({
+      removeCallback: (ground) => {
+        this.grounds?.add(ground);
+      },
+    });
+
+    for (var i = 0; i < 1000; i++) {
       const ground = this.physics.add
         .image(40 * i, 95, "ground", 0)
         .setOrigin(0)
@@ -32,7 +51,7 @@ export default class SceneGame extends Scene {
         .setImmovable(true)
         .setBodySize(40, 50, true);
       ground.body.allowGravity = false;
-      grounds.push(ground);
+      this.grounds.add(ground);
     }
 
     this.player = this.physics.add
@@ -47,7 +66,7 @@ export default class SceneGame extends Scene {
     // this.add.image(140, 50, "gui", 5).setOrigin(0.5).setScale(3);
     // this.add.image(140, 115, "character", 18).setOrigin(0.5).setScale(2);
 
-    this.physics.add.collider(this.player, grounds, () => {
+    this.physics.add.collider(this.player, this.grounds, () => {
       // console.log(this.controller?.currentState);
       if (this.controller?.currentState === StateType.Jumping)
         this.controller?.setState(StateType.Standing);
@@ -60,12 +79,34 @@ export default class SceneGame extends Scene {
     this.keySlide = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.DOWN
     );
+
+    this.cameras.main.startFollow(this.player, true);
+    this.cameras.main.setBounds(
+      0,
+      0,
+      Number.MAX_SAFE_INTEGER,
+      this.scale.baseSize.height
+    );
+
+    // this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, 160);
   }
   update(time: number, delta: number): void {
     if (!this.player) return;
     if (!this.controller) return;
-    // this.player.play(this.controller.currentState || StateType.Standing);
 
+    this.stage = Math.floor(time / 1000);
+    this.sky?.setFrame(
+      (this.stage % 6) +
+        (Math.floor(this.stage / 6) % 2) * (6 - (this.stage % 6))
+    );
+
+    // 0 1 2 3 4 5
+    // t 0 ~ 5
+    // 6 5 4 3 2 1
+    // t 6 ~ 11
+    // 0 1 2 3 4 5
+
+    // this.player.play(this.controller.currentState || StateType.Standing);
     switch (true) {
       case this.keyJump?.isDown:
         this.controller?.setState?.(StateType.Jumping);
