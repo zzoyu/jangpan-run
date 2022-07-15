@@ -29,7 +29,7 @@ export default class SceneGame extends Scene {
     this.sky = this.add
       .tileSprite(0, 0, 280, 160, "sky", this.stage - 1)
       .setOrigin(0, 0)
-      .setScrollFactor(0, 0);
+      .setScrollFactor(0.25, 0);
 
     this.grounds = this.add.group({
       removeCallback: (ground) => {
@@ -95,10 +95,7 @@ export default class SceneGame extends Scene {
     if (!this.controller) return;
 
     this.stage = Math.floor(time / 1000);
-    this.sky?.setFrame(
-      (this.stage % 6) +
-        (Math.floor(this.stage / 6) % 2) * (6 - (this.stage % 6))
-    );
+    this.sky?.setFrame(this.stage % 14);
 
     // 0 1 2 3 4 5
     // t 0 ~ 5
