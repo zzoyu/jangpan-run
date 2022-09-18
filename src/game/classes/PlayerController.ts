@@ -89,8 +89,11 @@ export class PlayerController {
     });
 
     this.player.setCollideWorldBounds(true);
-    this.player.setVelocityX(100);
     this.setState?.(StateType.Standing);
+  }
+
+  updateVelocity(stage: number) {
+    this.player.setVelocityX(100 + stage * 10);
   }
 
   setState(state: StateType) {

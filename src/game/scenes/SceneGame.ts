@@ -5,7 +5,10 @@ import {
   StateType,
 } from "../classes/PlayerController";
 
+const TIME_PER_STAGE = 1000;
+
 export default class SceneGame extends Scene {
+  isStarted: Boolean = false;
   keyJump: Phaser.Input.Keyboard.Key | undefined;
   keySlide: Phaser.Input.Keyboard.Key | undefined;
   player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
@@ -13,13 +16,20 @@ export default class SceneGame extends Scene {
   controller: PlayerController | undefined;
   sky: Phaser.GameObjects.TileSprite | undefined;
   stage = 1;
+  startedTime: number = 0;
+
+  // groundsPool: Phaser.GameObjects.Group | undefined;
+  title: Phaser.GameObjects.Image | undefined;
+  gui: Phaser.GameObjects.Image | undefined;
   grounds: Phaser.GameObjects.Group | undefined;
   groundsPool: Phaser.GameObjects.Group | undefined;
   constructor() {
     super({ key: SceneGame.name });
   }
 
-  preload() {}
+  preload() {
+    this.load.image("title", "./assets/images/title-2.png");
+  }
 
   create() {
     // for (var i = 0; i < 7; i++) {
@@ -47,12 +57,14 @@ export default class SceneGame extends Scene {
       const ground = this.physics.add
         .image(40 * i, 95, "ground", 0)
         .setOrigin(0)
-        .setCollideWorldBounds(true)
+        .setCollideWorldBounds(false)
         .setImmovable(true)
         .setBodySize(40, 50, true);
       ground.body.allowGravity = false;
-      this.grounds.add(ground);
+      this.grounds?.add(ground);
     }
+
+    this.title = this.add.image(140, 60, "title").setOrigin(0.5).setScale(2);
 
     this.player = this.physics.add
       .sprite(40, 92, "character")
@@ -60,14 +72,7 @@ export default class SceneGame extends Scene {
 
     this.controller = new PlayerController(this.player, this);
 
-    // this.add.image(15, 115, "gui", 3).setOrigin(0);
-    // this.add.image(225, 115, "gui", 0).setOrigin(0);
-
-    // this.add.image(140, 50, "gui", 5).setOrigin(0.5).setScale(3);
-    // this.add.image(140, 115, "character", 18).setOrigin(0.5).setScale(2);
-
     this.physics.add.collider(this.player, this.grounds, () => {
-      // console.log(this.controller?.currentState);
       if (this.controller?.currentState === StateType.Jumping)
         this.controller?.setState(StateType.Standing);
     });
@@ -80,22 +85,32 @@ export default class SceneGame extends Scene {
       Phaser.Input.Keyboard.KeyCodes.DOWN
     );
 
-    this.cameras.main.startFollow(this.player, true);
-    this.cameras.main.setBounds(
-      0,
-      0,
-      Number.MAX_SAFE_INTEGER,
-      this.scale.baseSize.height
-    );
+    // this.cameras.main.startFollow(this.player, true);
+    // this.cameras.main.setBounds(
+    //   0,
+    //   0,
+    //   Number.MAX_SAFE_INTEGER,
+    //   this.scale.baseSize.height
+    // );
+    this.gui = this.add.image(140, 105, "gui", 4).setOrigin(0.5).setScale(2);
 
     // this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, 160);
   }
+
+  // update stage
+  updateStage(startedTime: number, currentTime: number) {
+    if (this.isStarted === false) return;
+    this.stage = Math.floor((currentTime - startedTime) / TIME_PER_STAGE);
+    this.sky?.setFrame(this.stage % 14);
+    this.controller?.updateVelocity(this.stage);
+    // this.moveGrounds(this.stage);
+  }
+
   update(time: number, delta: number): void {
     if (!this.player) return;
     if (!this.controller) return;
 
-    this.stage = Math.floor(time / 1000);
-    this.sky?.setFrame(this.stage % 14);
+    this.updateStage(this.startedTime, time);
 
     // 0 1 2 3 4 5
     // t 0 ~ 5
@@ -105,6 +120,14 @@ export default class SceneGame extends Scene {
 
     // this.player.play(this.controller.currentState || StateType.Standing);
     switch (true) {
+      case this.isStarted === false &&
+        (this.keyJump?.isDown || this.keySlide?.isDown):
+        this.isStarted = true;
+        this.startedTime = time;
+        this.gui?.destroy();
+        // this.controller.startGame(this.stage);
+
+        break;
       case this.keyJump?.isDown:
         this.controller?.setState?.(StateType.Jumping);
         break;

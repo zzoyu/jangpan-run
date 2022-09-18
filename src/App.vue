@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { env } from "process";
 import { nextTick, onMounted, ref } from "vue";
+import launch from "./game";
 
 const container = ref<HTMLElement>();
 const game = ref();
@@ -9,14 +10,12 @@ onMounted(() =>
   nextTick(async () => {
     if (!container.value) return;
 
-    const launch = (await import("./game")).default;
-
     game.value = await launch(container.value, {
       type: Phaser.AUTO,
       width: 280,
       height: 160,
       pixelArt: true,
-      zoom: 1,
+      zoom: 3,
       physics: {
         default: "arcade",
         arcade: {
