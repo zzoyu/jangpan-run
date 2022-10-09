@@ -6,7 +6,7 @@ export default class SceneLoading extends Scene {
   }
 
   preload() {
-    this.load.setPath("./assets/");
+    this.load.setPath("assets/");
     this.load.audio("jump", "sounds/jump.wav");
     this.load.spritesheet("character", "images/spritesheet.png", {
       frameWidth: 40,

@@ -93,7 +93,7 @@ export class PlayerController {
   }
 
   updateVelocity(stage: number) {
-    this.player.setVelocityX(100 + stage * 10);
+    // this.player.setVelocityX(100 + stage * 10);
   }
 
   setState(state: StateType) {

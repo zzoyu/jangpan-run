@@ -69,6 +69,7 @@ export default class SceneGame extends Scene {
     this.player = this.physics.add
       .sprite(40, 92, "character")
       .setBodySize(20, 20, true);
+    // .setCollideWorldBounds(true, 0, 0)
 
     this.controller = new PlayerController(this.player, this);
 
@@ -94,7 +95,7 @@ export default class SceneGame extends Scene {
     // );
     this.gui = this.add.image(140, 105, "gui", 4).setOrigin(0.5).setScale(2);
 
-    // this.cameras.main.setBounds(0, 0, Number.MAX_SAFE_INTEGER, 160);
+    // this.cameras.main.setBounds(-100, 0, Number.MAX_SAFE_INTEGER, 160);
   }
 
   // update stage
@@ -102,11 +103,19 @@ export default class SceneGame extends Scene {
     if (this.isStarted === false) return;
     this.stage = Math.floor((currentTime - startedTime) / TIME_PER_STAGE);
     this.sky?.setFrame(this.stage % 14);
-    this.controller?.updateVelocity(this.stage);
-    // this.moveGrounds(this.stage);
+    // this.controller?.updateVelocity(this.stage);
+    this.moveGrounds(this.stage);
+  }
+  moveGrounds(stage: number) {
+    this.controller?.updateVelocity(stage);
+    this.grounds?.children.iterate((ground: any) => {
+      // set velocity of ground
+      ground.setVelocityX(-100 - stage * 10);
+    });
   }
 
   update(time: number, delta: number): void {
+    this.sky?.setTilePosition(time / 100, 0);
     if (!this.player) return;
     if (!this.controller) return;
 
