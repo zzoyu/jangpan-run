@@ -32,11 +32,7 @@ onMounted(() =>
 </script>
 
 <template>
-  <Suspense>
-    <div ref="container"></div>
-
-    <template #fallback> 초기화 중입니다... </template>
-  </Suspense>
+  <div ref="container"></div>
 </template>
 
 <style>
